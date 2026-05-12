@@ -23,6 +23,10 @@ class DatabaseConfig(BaseSettings):
     @property
     def dsn(self):
         return f"postgresql+asyncpg://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.name}"
+    
+    @property
+    def sync_dsn(self):
+        return f"postgresql+psycopg2://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.name}"
 
 
 class Config(BaseSettings):
