@@ -13,11 +13,12 @@ if TYPE_CHECKING:
 class Post(Base):
     __tablename__ = "posts"
 
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     link: Mapped[str] = mapped_column(String(255), unique=True)
     text: Mapped[Optional[str]] = mapped_column(Text)
     date: Mapped[datetime] = mapped_column(DateTime, index=True)
-    status_id: Mapped[int] = mapped_column(ForeignKey("post_statuses.id"))
+    status_id: Mapped[int] = mapped_column(ForeignKey("post_statuses.id"), default=0)
 
     user: Mapped["User"] = relationship("User", back_populates="posts")
     alert: Mapped["Alert"] = relationship("Alert", back_populates="post", uselist=False, cascade="all, delete-orphan")
@@ -26,6 +27,7 @@ class Post(Base):
 class PostStatus(Base):
     __tablename__ = "post_statuses"
 
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     status: Mapped[str] = mapped_column(String(30), unique=True)
 
     posts: Mapped[list["Post"]] = relationship("Post", back_populates="status")

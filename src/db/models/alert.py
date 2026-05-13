@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 class Alert(Base, CreatedAtMixin):
     __tablename__ = "alerts"
 
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), unique=True)
     reason: Mapped[str] = mapped_column(Text)
