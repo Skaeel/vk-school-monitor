@@ -11,7 +11,7 @@ _common_config = SettingsConfigDict(
 class DatabaseConfig(BaseSettings):
     model_config = SettingsConfigDict(
         **_common_config,
-        env_prefix="DB_",
+        env_prefix="db_",
     )
 
     user: str
@@ -29,8 +29,18 @@ class DatabaseConfig(BaseSettings):
         return f"postgresql+psycopg2://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.name}"
 
 
+class Token(BaseSettings):
+    model_config = SettingsConfigDict(
+        **_common_config,
+        env_prefix="vk_"
+    )
+
+    token: SecretStr
+
+
 class Config(BaseSettings):
     db: DatabaseConfig = Field(default_factory=DatabaseConfig)
+    token: Token = Field(default_factory=Token)
 
 
 settings = Config()
