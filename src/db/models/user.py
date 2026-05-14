@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import BigInteger, ForeignKey, String
+from sqlalchemy import BigInteger, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.db.mixins import CreatedAtMixin, UpdatedAtMixin
@@ -17,9 +18,10 @@ class User(Base, CreatedAtMixin, UpdatedAtMixin):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, unique=True, index=True)
     name: Mapped[Optional[str]] = mapped_column(String(30))
     surname: Mapped[Optional[str]] = mapped_column(String(30))
-    phone: Mapped[str] = mapped_column(String(15))
+    phone: Mapped[Optional[str]] = mapped_column(String(15))
     link: Mapped[str] = mapped_column(String(255), unique=True)
     status_id: Mapped[int] = mapped_column(ForeignKey("user_statuses.id"), default=0)
+    last_post_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=False), default=None)
 
     status: Mapped["UserStatus"] = relationship("UserStatus")
     posts: Mapped[list["Post"]] = relationship("Post", back_populates="user", cascade="all, delete-orphan")
