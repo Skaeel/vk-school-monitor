@@ -88,7 +88,8 @@ class VKCLient:
                     "date": post["date"],
                     "id": post["id"],
                     "owner_id": post["owner_id"],
-                    "text": post["text"]
+                    "text": post["text"],
+                    "link": f"https://vk.com/wall-{post["owner_id"]}_{post["id"]}"
                 }
                 last_post_date = domains_last_post_date_map[format_post["owner_id"]]
                 if last_post_date is None or format_post["date"] > last_post_date: # last_post_date в другом формате!
