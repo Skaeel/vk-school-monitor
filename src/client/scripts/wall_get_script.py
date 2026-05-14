@@ -1,4 +1,4 @@
-def wall_get_any(domains: list):
+def wall_get_script(domains: list):
     script = f"""
     var domains = {domains};
     var results = [];
@@ -7,10 +7,12 @@ def wall_get_any(domains: list):
     while (i < domains.length) {{
         var posts = API.wall.get({{
             "domain": domains[i],
-            "count": 100,
-            "filter": "all"
+            "count": 2,
+            "filter": "owner"
         }});
-        results.push(posts);
+        if (posts.items) {{
+            results.push(posts.items);
+        }}
         i = i + 1;
     }}
     return results;
