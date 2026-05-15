@@ -7,7 +7,7 @@ def wall_get_script(domains: list):
     while (i < domains.length) {{
         var posts = API.wall.get({{
             "domain": domains[i],
-            "count": 2,
+            "count": 100,
             "filter": "owner"
         }});
         if (posts.items) {{

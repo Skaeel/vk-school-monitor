@@ -20,10 +20,10 @@ class User(Base, CreatedAtMixin, UpdatedAtMixin):
     surname: Mapped[Optional[str]] = mapped_column(String(30))
     phone: Mapped[Optional[str]] = mapped_column(String(15))
     link: Mapped[str] = mapped_column(String(255), unique=True)
-    status_id: Mapped[int] = mapped_column(ForeignKey("user_statuses.id"), default=0)
+    status_id: Mapped[int] = mapped_column(ForeignKey("user_statuses.id"), index=True, default=0)
     last_post_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=False), default=None)
 
-    status: Mapped["UserStatus"] = relationship("UserStatus")
+    status: Mapped["UserStatus"] = relationship("UserStatus", back_populates="users")
     posts: Mapped[list["Post"]] = relationship("Post", back_populates="user", cascade="all, delete-orphan")
     alerts: Mapped[list["Alert"]] = relationship("Alert", back_populates="user", cascade="all, delete-orphan")
 

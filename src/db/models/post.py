@@ -18,8 +18,9 @@ class Post(Base):
     link: Mapped[str] = mapped_column(String(255), unique=True)
     text: Mapped[Optional[str]] = mapped_column(Text)
     date: Mapped[datetime] = mapped_column(DateTime, index=True)
-    status_id: Mapped[int] = mapped_column(ForeignKey("post_statuses.id"), default=0)
+    status_id: Mapped[int] = mapped_column(ForeignKey("post_statuses.id"), index=True, default=0)
 
+    status: Mapped["PostStatus"] = relationship("PostStatus", back_populates="posts")
     user: Mapped["User"] = relationship("User", back_populates="posts")
     alert: Mapped["Alert"] = relationship("Alert", back_populates="post", uselist=False, cascade="all, delete-orphan")
         

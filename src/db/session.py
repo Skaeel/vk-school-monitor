@@ -11,7 +11,7 @@ from src.config import settings
 
 
 async_engine = create_async_engine(
-    url=settings.DATABASE_URL,
+    url=settings.db.dsn,
     echo=False,          
     pool_pre_ping=True,
     pool_size=5,

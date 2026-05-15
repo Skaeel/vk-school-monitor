@@ -64,38 +64,43 @@ class VKCLient:
                 logger.error(f"HTTP Request failed: {str(e)}")
                 raise
 
-    async def wall_get(self, domains_last_post_date_map: dict):
-        if not domains_last_post_date_map:
+    async def wall_get(self, id_last_post_map: dict[int, int | None]):
+        if not id_last_post_map:
             return []
         
-        domains = domains_last_post_date_map.keys()
-        chunks = [domains[i:i+25] for i in range(0, len(domains), 25)]
-        all_new_posts = []
-
-        async def _process_chunk(domains: list[int]):
-            script = wall_get_script(domains)
-            return await self._execute(script)
+        CHUNK_SIZE = 25 # limit VK API
         
-        async def _limited_process(domains: list[int]):
+        ids = list(id_last_post_map.keys())
+        chunks = [ids[i:i+CHUNK_SIZE] for i in range(0, len(ids), 25)]
+        new_posts = []
+        
+        async def _fetch_chunk(ids_chunk: list[int]):
             async with self._semaphore:
-                return await _process_chunk(domains)
+                script = wall_get_script(ids_chunk)
+                return await self._execute(script)
             
-        results = await asyncio.gather(*[_limited_process(c) for c in chunks])
+        chunks_result = await asyncio.gather(*[_fetch_chunk(c) for c in chunks])
 
-        for posts in results:
-            for post in posts:
-                format_post = {
-                    "date": post["date"],
-                    "id": post["id"],
-                    "owner_id": post["owner_id"],
-                    "text": post["text"],
-                    "link": f"https://vk.com/wall-{post["owner_id"]}_{post["id"]}"
-                }
-                last_post_date = domains_last_post_date_map[format_post["owner_id"]]
-                if last_post_date is None or format_post["date"] > last_post_date: # last_post_date в другом формате!
-                    all_new_posts.append(format_post)
-                else:
-                    break
+        for chunk_result in chunks_result:
+            for owner_posts in chunk_result:
+                if not owner_posts:
+                    continue
+                owner_id = owner_posts[0]["owner_id"]
+                last_date = id_last_post_map.get(owner_id)
 
-        return all_new_posts
+                for post in owner_posts:
+                    post_data = {
+                        "date": post["date"],
+                        "id": post["id"],
+                        "owner_id": post["owner_id"],
+                        "text": post["text"],
+                        "link": f"https://vk.com/wall{post["owner_id"]}_{post["id"]}"
+                    }
+
+                    if last_date is None or post["date"] > last_date:
+                        new_posts.append(post_data)
+                    else:
+                        break
+
+        return new_posts
             
